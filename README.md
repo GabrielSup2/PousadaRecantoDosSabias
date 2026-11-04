@@ -24,6 +24,15 @@ O sistema centraliza os quartos e as reservas em uma aplicação Web, com valida
 
 Em desenvolvimento.
 
+## Como rodar o backend
+
+```bash
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+A API fica em `http://localhost:8000`, o health check em `/health` e a documentação em `/docs`.
+
 ## Requisitos
 
 - Python 3.12+

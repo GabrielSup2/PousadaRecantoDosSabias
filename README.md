@@ -1,0 +1,25 @@
+# Pousada Recanto dos Sábias
+
+Sistema Web para cadastrar os quartos e controlar as reservas da Pousada Recanto dos Sábias.
+
+## Visão geral
+
+A pousada controla as reservas em uma agenda de papel. No último feriado, dois casais chegaram para ocupar o mesmo quarto. O sistema centraliza os quartos e as reservas em uma aplicação Web, com validação de datas, capacidade e sobreposição.
+
+## Funcionalidades
+
+- Cadastro, edição, listagem e exclusão de quartos.
+- Cadastro, edição, listagem e exclusão de reservas.
+- Reservas vinculadas a um quarto, com data de entrada e saída.
+- Validação de campos obrigatórios, capacidade e sobreposição de datas.
+
+## Stack
+
+- Backend: FastAPI + Firebase Firestore
+- Frontend: React + Vite + Tailwind CSS
+- Testes: Pytest
+- Deploy: Render + Vercel
+
+## Status
+
+Em desenvolvimento.

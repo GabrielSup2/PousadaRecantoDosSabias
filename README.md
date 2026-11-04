@@ -23,3 +23,22 @@ A pousada controla as reservas em uma agenda de papel. No último feriado, dois 
 ## Status
 
 Em desenvolvimento.
+
+## Requisitos
+
+- Python 3.12+
+- Node.js 20+
+
+## Testes
+
+```bash
+pytest -v
+```
+
+## Contribuição
+
+Leia o [CONTRIBUTING.md](CONTRIBUTING.md) antes de abrir um pull request.
+
+## Licença
+
+MIT — veja [LICENSE](LICENSE).

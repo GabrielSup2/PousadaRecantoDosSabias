@@ -2,6 +2,8 @@
 
 Sistema Web para cadastrar os quartos e controlar as reservas da Pousada Recanto dos Sábias.
 
+[![CI](https://github.com/GabrielSup2/PousadaRecantoDosSabias/actions/workflows/main.yml/badge.svg)](https://github.com/GabrielSup2/PousadaRecantoDosSabias/actions)
+
 ## Visão geral
 
 O sistema centraliza os quartos e as reservas em uma aplicação Web, com validação de datas, capacidade e sobreposição.
@@ -43,6 +45,10 @@ A API fica em `http://localhost:8000`, o health check em `/health` e a documenta
 ```bash
 pytest -v
 ```
+
+## CI
+
+O pipeline em `.github/workflows/main.yml` instala as dependências e executa `pytest` a cada push na `main`.
 
 ## Contribuição
 

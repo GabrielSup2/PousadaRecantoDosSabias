@@ -48,7 +48,7 @@ pytest -v
 
 ## CI
 
-O pipeline em `.github/workflows/main.yml` instala as dependências e executa `pytest` a cada push na `main`.
+O pipeline em `.github/workflows/main.yml` instala as dependências e executa `pytest` a cada push na `main` e nas branches `feat/**`.
 
 ## Contribuição
 

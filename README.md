@@ -43,6 +43,16 @@ Os dados são armazenados no Firebase Firestore, nas coleções `rooms`, `reserv
 
 As senhas são armazenadas com hash bcrypt. A autenticação usa JWT com expiração configurável, e as rotas são protegidas por papéis (`admin` e `user`).
 
+## Autenticação
+
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/auth/register` | Cria uma conta de usuário |
+| POST | `/auth/login` | Autentica e devolve um token JWT |
+| GET | `/auth/me` | Retorna os dados do usuário autenticado |
+
+As rotas de `/users` permitem consultar, atualizar e excluir usuários, com permissões de administrador.
+
 ## Requisitos
 
 - Python 3.12+

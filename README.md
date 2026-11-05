@@ -39,6 +39,10 @@ A API fica em `http://localhost:8000`, o health check em `/health` e a documenta
 
 Os dados são armazenados no Firebase Firestore, nas coleções `rooms`, `reservations` e `users`. A conexão é feita pelo backend com uma conta de serviço; nenhuma credencial é versionada.
 
+## Segurança
+
+As senhas são armazenadas com hash bcrypt. A autenticação usa JWT com expiração configurável, e as rotas são protegidas por papéis (`admin` e `user`).
+
 ## Requisitos
 
 - Python 3.12+

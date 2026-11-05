@@ -35,6 +35,10 @@ uvicorn app.main:app --reload
 
 A API fica em `http://localhost:8000`, o health check em `/health` e a documentação em `/docs`.
 
+## Persistência
+
+Os dados são armazenados no Firebase Firestore, nas coleções `rooms`, `reservations` e `users`. A conexão é feita pelo backend com uma conta de serviço; nenhuma credencial é versionada.
+
 ## Requisitos
 
 - Python 3.12+

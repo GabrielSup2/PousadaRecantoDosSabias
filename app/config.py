@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     environment: str = "development"
-    app_name: str = "pousada-recanto-dos-sabios-api"
+    app_name: str = "pousada-recanto-dos-sabias-api"
     app_host: str = "0.0.0.0"
     app_port: int = 8000
 
@@ -17,10 +17,15 @@ class Settings(BaseSettings):
     firebase_credentials_json_path: str | None = None
     firebase_credentials_json: str | None = None
 
+    admin_email: str = "admin@pousadarecanto.com"
+    admin_password: str = "troque-esta-senha"
+    admin_name: str = "Administrador da Pousada"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_prefix="",
-        case_sensitive=False
+        case_sensitive=False,
+        extra="ignore",
     )
 
 

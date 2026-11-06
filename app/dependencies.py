@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
@@ -6,19 +8,28 @@ from app.repositories.user_repository import UserRepository
 from app.schemas.user import UserInDB, UserPublic
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+oauth2_scheme_optional = OAuth2PasswordBearer(
+    tokenUrl="auth/login", auto_error=False
+)
 
 
-def get_current_user(
-    token: str = Depends(oauth2_scheme),
-) -> UserInDB:
+def _to_public(user: UserInDB) -> UserPublic:
+    return UserPublic(
+        id=user.id,
+        email=user.email,
+        full_name=user.full_name,
+        role=user.role,
+    )
+
+
+def _resolve_token(token: str) -> UserInDB:
     user_id = decode_token(token)
     if not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token inválido ou expirado",
         )
-    repo = UserRepository()
-    user = repo.get_by_id(user_id)
+    user = UserRepository().get_by_id(user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -27,13 +38,22 @@ def get_current_user(
     return user
 
 
+def get_current_user(
+    token: str = Depends(oauth2_scheme),
+) -> UserInDB:
+    return _resolve_token(token)
+
+
+def get_optional_current_user(
+    token: Optional[str] = Depends(oauth2_scheme_optional),
+) -> Optional[UserPublic]:
+    if not token:
+        return None
+    return _to_public(_resolve_token(token))
+
+
 def get_current_active_user(user: UserInDB = Depends(get_current_user)) -> UserPublic:
-    return UserPublic(
-        id=user.id,
-        email=user.email,
-        full_name=user.full_name,
-        role=user.role,
-    )
+    return _to_public(user)
 
 
 def get_current_admin(user: UserInDB = Depends(get_current_user)) -> UserPublic:
@@ -42,10 +62,4 @@ def get_current_admin(user: UserInDB = Depends(get_current_user)) -> UserPublic:
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Acesso restrito a administradores",
         )
-    return UserPublic(
-        id=user.id,
-        email=user.email,
-        full_name=user.full_name,
-        role=user.role,
-    )
-
+    return _to_public(user)

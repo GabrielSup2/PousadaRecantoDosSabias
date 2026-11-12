@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=DM+Sans:wght@400;500;700&display=swap');
+
+.not-found-page {
+  --ink: #1f1b3a;
+  --muted: #625f7a;
+  --violet: #667eea;
+  --plum: #764ba2;
+
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #f7f6fb, #ece9f8);
+  color: var(--ink);
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+.not-found-card {
+  width: 100%;
+  max-width: 460px;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #e2e0ee;
+  border-radius: 18px;
+  padding: 48px 32px;
+  box-shadow: 0 18px 40px rgba(45, 37, 102, 0.12);
+}
+
+.not-found-code {
+  display: block;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(4rem, 12vw, 6rem);
+  line-height: 1;
+  color: var(--violet);
+}
+
+.not-found-card h1 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.7rem;
+  margin-top: 8px;
+}
+
+.not-found-card p {
+  color: var(--muted);
+  margin-top: 10px;
+  font-size: 15px;
+}
+
+.not-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.not-found-page .btn {
+  display: inline-block;
+  border-radius: 10px;
+  padding: 11px 20px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.not-found-page .btn-main {
+  background: linear-gradient(135deg, var(--violet), var(--plum));
+  color: #fff;
+}
+
+.not-found-page .btn-ghost {
+  border: 1.5px solid var(--violet);
+  color: var(--plum);
+}
+
+@media (max-width: 480px) {
+  .not-found-card {
+    padding: 36px 22px;
+  }
+}

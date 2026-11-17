@@ -7,6 +7,10 @@ Uso, a partir da raiz do projeto:
 O script é idempotente: usuário e quartos já existentes são ignorados.
 """
 import os
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app.repositories.room_repository import RoomRepository
 from app.repositories.user_repository import UserRepository

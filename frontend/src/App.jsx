@@ -10,7 +10,10 @@ import Layout from './components/Layout'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
-import DashboardPage from './pages/DashBoardPage'
+import Dashboard from './pages/Dashboard'
+import Rooms from './pages/Rooms'
+import Reservations from './pages/Reservations'
+import MyReservations from './pages/MyReservations'
 import ProfilePage from './pages/ProfilePage'
 import AdminUsersPage from './pages/AdminUsersPage'
 import NotFoundPage from './pages/NotFoundPage'
@@ -39,7 +42,10 @@ function AppRoutes() {
       <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
 
       <Route element={<PrivateRoute><Layout /></PrivateRoute>}>
-        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/rooms" element={<Rooms />} />
+        <Route path="/rooms/:id/reservations" element={<Reservations />} />
+        <Route path="/reservations" element={<MyReservations />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
       </Route>

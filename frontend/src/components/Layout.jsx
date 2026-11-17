@@ -1,5 +1,13 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Settings, Users, LogOut, ChevronRight } from 'lucide-react'
+import {
+  LayoutDashboard,
+  BedDouble,
+  CalendarDays,
+  Settings,
+  Users,
+  LogOut,
+  ChevronRight,
+} from 'lucide-react'
 import useAuthStore from '../store/authStore'
 import { AppLogo } from './AppLogo'
 import AppFooter from './AppFooter'
@@ -7,6 +15,8 @@ import AppFooter from './AppFooter'
 // Itens do menu que todo mundo tem acesso
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, color: 'text-indigo-500' },
+  { to: '/rooms', label: 'Quartos', icon: BedDouble, color: 'text-sky-500' },
+  { to: '/reservations', label: 'Reservas', icon: CalendarDays, color: 'text-rose-500' },
   { to: '/profile', label: 'Perfil', icon: Settings, color: 'text-purple-500' },
 ]
 

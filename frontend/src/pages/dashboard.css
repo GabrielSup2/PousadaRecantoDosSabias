@@ -1,0 +1,24 @@
+/* Só o que é específico do Dashboard. Botões, tabela, pills e estados vêm de rooms.css / reservations.css */
+
+.dash-hero { margin-bottom: 24px; }
+.dash-hero h1 { font-family: 'Fraunces', Georgia, serif; font-size: clamp(1.6rem, 4vw, 2.2rem); line-height: 1.2; }
+.dash-hero p { color: #625f7a; margin-top: 4px; }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.stat { gap: 2px; padding: 18px 20px; }
+.stat-label { font-size: 13px; font-weight: 500; color: #625f7a; }
+.stat-value { font-family: 'Fraunces', Georgia, serif; font-size: 2.2rem; line-height: 1.1; color: #1f1b3a; }
+.stat-note { font-size: 12.5px; color: #8c89a3; }
+
+.dash-section { margin-top: 32px; }
+.dash-section h2 { font-family: 'Fraunces', Georgia, serif; font-size: 1.3rem; margin-bottom: 12px; }
+.dash-section-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.dash-section-head a { font-size: 14px; color: #5a54b8; }
+
+.shortcuts { display: flex; flex-wrap: wrap; gap: 10px; }
+.shortcuts-label { font-size: 13px; font-weight: 500; color: #625f7a; margin: 16px 0 8px; }

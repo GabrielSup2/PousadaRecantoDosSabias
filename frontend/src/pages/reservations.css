@@ -1,0 +1,90 @@
+/* Complementa o rooms.css (botões, campos, modal, pills e estados vêm de lá) */
+
+.res-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1px solid #e2e0ee;
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+.res-header h1 { font-size: 1.7rem; margin-bottom: 6px; overflow-wrap: anywhere; }
+.res-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; font-size: 14px; color: #625f7a; }
+.res-header-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* Tabela */
+.table-wrap {
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid #e2e0ee;
+  border-radius: 14px;
+}
+.res-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 820px; }
+.res-table th {
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+  color: #625f7a;
+  padding: 12px 14px;
+  border-bottom: 1px solid #e2e0ee;
+  white-space: nowrap;
+}
+.res-table td { padding: 12px 14px; border-bottom: 1px solid #eeecf6; vertical-align: middle; }
+.res-table tbody tr:last-child td { border-bottom: 0; }
+.res-table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.row-canceled td { color: #8c89a3; }
+.row-canceled td.num { text-decoration: line-through; }
+.row-actions { display: flex; gap: 6px; justify-content: flex-end; white-space: nowrap; }
+.btn-sm { padding: 6px 10px; font-size: 13px; }
+
+/* Resumo de noites e total no formulário */
+.summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  background: #eef1fc;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #4a4763;
+  margin-top: 4px;
+}
+.summary strong { font-size: 1.25rem; color: #1f1b3a; }
+
+.field input[readonly] { background: #f1f0f7; color: #625f7a; cursor: default; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .res-header { padding: 16px; }
+  .res-header-actions { width: 100%; }
+  .res-header-actions .btn { flex: 1; }
+}
+
+/* Filtros da página Minhas reservas */
+.filters {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.filters .field { margin-bottom: 0; }
+
+/* Linha pequena embaixo de um valor da tabela (telefone, "você") */
+.sub-line { display: block; font-size: 12px; color: #8c89a3; margin-top: 2px; }
+
+@media (max-width: 640px) {
+  .filters { grid-template-columns: 1fr; }
+}

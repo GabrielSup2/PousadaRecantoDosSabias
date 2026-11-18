@@ -10,7 +10,7 @@ from app.schemas.reservation import (
     ReservationPublic,
     ReservationUpdate,
 )
-from app.schemas.room import RoomPublic
+from app.schemas.room import RoomAvailability, RoomPublic
 from app.schemas.user import UserPublic
 
 REQUIRED_UPDATE_FIELDS = (
@@ -37,6 +37,45 @@ class ReservationService:
     ) -> list[ReservationPublic]:
         user_id = None if current_user.role == "admin" else current_user.id
         return self.reservation_repo.get_all(room_id=room_id, user_id=user_id)
+
+    def get_room_availability(
+        self,
+        check_in: date,
+        check_out: date,
+        current_user: UserPublic,
+        ignore_reservation_id: Optional[str] = None,
+    ) -> list[RoomAvailability]:
+        if check_out <= check_in:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="A data de saída deve ser posterior à data de entrada",
+            )
+
+        ignore_id = None
+        if ignore_reservation_id:
+            ignored = self.get_reservation_by_id(
+                ignore_reservation_id, current_user
+            )
+            ignore_id = ignored.id
+
+        reservations = self.reservation_repo.get_all()
+        rooms = self.room_repo.get_all(active_only=True)
+        availability = []
+
+        for room in rooms:
+            available = not any(
+                reservation.id != ignore_id
+                and reservation.room_id == room.id
+                and reservation.status != "cancelled"
+                and check_in < reservation.check_out
+                and check_out > reservation.check_in
+                for reservation in reservations
+            )
+            availability.append(
+                RoomAvailability(**room.model_dump(), available=available)
+            )
+
+        return availability
 
     def get_reservation_by_id(
         self, reservation_id: str, current_user: UserPublic

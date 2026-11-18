@@ -1,10 +1,21 @@
+from datetime import date
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.dependencies import get_current_admin, get_optional_current_user
-from app.schemas.room import RoomCreate, RoomPublic, RoomUpdate
+from app.dependencies import (
+    get_current_active_user,
+    get_current_admin,
+    get_optional_current_user,
+)
+from app.schemas.room import (
+    RoomAvailability,
+    RoomCreate,
+    RoomPublic,
+    RoomUpdate,
+)
 from app.schemas.user import UserPublic
+from app.services.reservation_service import ReservationService
 from app.services.room_service import RoomService
 
 router = APIRouter(prefix="/rooms", tags=["rooms"])
@@ -29,6 +40,19 @@ def list_rooms(
     _ensure_can_see_inactive(include_inactive, current_user)
     service = RoomService()
     return service.get_all_rooms(include_inactive=include_inactive)
+
+
+@router.get("/availability", response_model=list[RoomAvailability])
+def get_room_availability(
+    check_in: date,
+    check_out: date,
+    ignore_reservation_id: Optional[str] = None,
+    current_user: UserPublic = Depends(get_current_active_user),
+):
+    service = ReservationService()
+    return service.get_room_availability(
+        check_in, check_out, current_user, ignore_reservation_id
+    )
 
 
 @router.get("/{room_id}", response_model=RoomPublic)

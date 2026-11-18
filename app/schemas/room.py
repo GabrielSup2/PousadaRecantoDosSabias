@@ -80,3 +80,7 @@ class RoomUpdate(BaseModel):
 
 class RoomPublic(RoomBase):
     id: str
+
+
+class RoomAvailability(RoomPublic):
+    available: bool

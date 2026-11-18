@@ -149,9 +149,9 @@ export default function LandingPage() {
 
         <section id="quartos">
           <div className="wrap">
-            <h2>Nossos quartos</h2>
+            <h2>Nossas categorias de quarto</h2>
             <p className="sub">
-              Três opções para cada tipo de viagem. Você só precisa entrar na sua conta na hora de confirmar a reserva.
+              Três categorias de quarto. A pousada tem 8 quartos no total — você só precisa entrar na sua conta na hora de confirmar a reserva.
             </p>
 
             <div className="rooms">

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { isAdmin, getUserId } from '../services/session';
 import { getRoom } from '../services/rooms';
+import { listUsers } from '../services/users';
 import {
   listRoomReservations, cancelReservation, deleteReservation,
   isCanceled, STATUS_LABEL, detailText,
@@ -9,6 +10,7 @@ import {
 import ReservationForm from '../components/ReservationForm';
 import Modal from '../components/Modal';
 import { brl, formatDate, formatPhone, nightsBetween } from '../utils/format';
+import { ROOM_TYPES, roomTypeKey } from '../utils/roomTypes';
 import './rooms.css';
 import './reservations.css';
 
@@ -20,6 +22,7 @@ export default function Reservations() {
 
   const [room, setRoom] = useState(null);
   const [reservations, setReservations] = useState([]);
+  const [usersById, setUsersById] = useState(new Map());
   const [status, setStatus] = useState('loading'); // loading | ok | error | notfound
   const [formState, setFormState] = useState(null); // null | { reservation: null | objeto }
   const [confirm, setConfirm] = useState(null); // null | { type: 'cancel' | 'delete', reservation }
@@ -36,16 +39,21 @@ export default function Reservations() {
     async (silent = false) => {
       if (!silent) setStatus('loading');
       try {
-        const [r, list] = await Promise.all([getRoom(id), listRoomReservations(id)]);
+        const [r, list, userList] = await Promise.all([
+          getRoom(id),
+          listRoomReservations(id),
+          admin ? listUsers() : Promise.resolve([]),
+        ]);
         setRoom(r);
         setReservations(list);
+        setUsersById(new Map(userList.map((user) => [String(user.id), user])));
         setStatus('ok');
       } catch (err) {
         if (err.status === 401) return goLogin();
         setStatus(err.status === 404 ? 'notfound' : 'error');
       }
     },
-    [id, goLogin]
+    [id, goLogin, admin]
   );
 
   useEffect(() => {
@@ -67,6 +75,11 @@ export default function Reservations() {
   // Dono ou admin. O backend continua sendo quem decide de verdade.
   const canManage = (r) =>
     admin || (userId != null && r.ownerId != null && String(r.ownerId) === String(userId));
+
+  const ownerName = (id) => {
+    const user = usersById.get(String(id));
+    return user?.full_name || user?.email || '—';
+  };
 
   const totalOf = (r) => r.total ?? nightsBetween(r.checkIn, r.checkOut) * room.dailyRate;
 
@@ -138,6 +151,7 @@ export default function Reservations() {
           <div>
             <h1>{room.name}</h1>
             <p className="res-meta">
+              <span>{ROOM_TYPES[roomTypeKey(room)]?.label}</span>
               <span>Até {room.capacity} {room.capacity === 1 ? 'hóspede' : 'hóspedes'}</span>
               <span>{brl.format(room.dailyRate)} / diária</span>
               <span className={`pill ${room.active ? 'pill-on' : 'pill-off'}`}>{room.active ? 'Ativo' : 'Inativo'}</span>
@@ -182,7 +196,7 @@ export default function Reservations() {
             <table className="res-table">
               <thead>
                 <tr>
-                  <th>Hóspede</th><th>Telefone</th><th>Hóspedes</th><th>Entrada</th>
+                  <th>Hóspede</th>{admin && <th>Usuário</th>}<th>Telefone</th><th>Hóspedes</th><th>Entrada</th>
                   <th>Saída</th><th>Status</th><th className="num">Total</th><th><span className="sr-only">Ações</span></th>
                 </tr>
               </thead>
@@ -192,6 +206,7 @@ export default function Reservations() {
                   return (
                     <tr key={r.id} className={canceled ? 'row-canceled' : undefined}>
                       <td>{r.guestName}</td>
+                      {admin && <td>{ownerName(r.ownerId)}</td>}
                       <td>{formatPhone(r.phone)}</td>
                       <td>{r.guests}</td>
                       <td>{formatDate(r.checkIn)}</td>

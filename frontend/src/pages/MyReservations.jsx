@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { isAdmin, getUserId } from '../services/session';
 import { listRooms } from '../services/rooms';
+import { listUsers } from '../services/users';
 import {
   listReservations, cancelReservation, deleteReservation,
   isCanceled, statusKey, STATUS_LABEL, detailText,
@@ -9,6 +10,7 @@ import {
 import ReservationForm from '../components/ReservationForm';
 import Modal from '../components/Modal';
 import { brl, formatDate, formatPhone, nightsBetween } from '../utils/format';
+import { ROOM_TYPES, roomTypeKey } from '../utils/roomTypes';
 import './rooms.css';
 import './reservations.css';
 
@@ -22,6 +24,7 @@ export default function MyReservations() {
 
   const [rooms, setRooms] = useState([]);
   const [reservations, setReservations] = useState([]);
+  const [usersById, setUsersById] = useState(new Map());
   const [status, setStatus] = useState('loading'); // loading | ok | error
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -38,16 +41,21 @@ export default function MyReservations() {
     async (silent = false) => {
       if (!silent) setStatus('loading');
       try {
-        const [list, roomList] = await Promise.all([listReservations(), listRooms(admin)]);
+        const [list, roomList, userList] = await Promise.all([
+          listReservations(),
+          listRooms(admin),
+          admin ? listUsers() : Promise.resolve([]),
+        ]);
         setReservations(list);
         setRooms(roomList);
+        setUsersById(new Map(userList.map((user) => [String(user.id), user])));
         setStatus('ok');
       } catch (err) {
         if (err.status === 401) return goLogin();
         setStatus('error');
       }
     },
-    [goLogin]
+    [goLogin, admin]
   );
 
   useEffect(() => {
@@ -79,6 +87,14 @@ export default function MyReservations() {
 
   const roomById = useMemo(() => new Map(rooms.map((r) => [String(r.id), r])), [rooms]);
   const roomName = (id) => roomById.get(String(id))?.name ?? `Quarto ${id}`;
+  const roomTypeLabel = (id) => {
+    const room = roomById.get(String(id));
+    return room ? ROOM_TYPES[roomTypeKey(room)]?.label ?? '' : '';
+  };
+  const ownerName = (id) => {
+    const user = usersById.get(String(id));
+    return user?.full_name || user?.email || '—';
+  };
 
   // Opções dos filtros: só o que existe nas reservas carregadas
   const statusOptions = useMemo(() => [...new Set(mine.map(statusKey))], [mine]);
@@ -236,7 +252,7 @@ export default function MyReservations() {
             <table className="res-table">
               <thead>
                 <tr>
-                  <th>Quarto</th><th>Hóspede</th><th>Entrada</th><th>Saída</th>
+                  <th>Quarto</th>{admin && <th>Usuário</th>}<th>Hóspede</th><th>Entrada</th><th>Saída</th>
                   <th>Hóspedes</th><th>Status</th><th className="num">Total</th>
                   <th><span className="sr-only">Ações</span></th>
                 </tr>
@@ -247,7 +263,11 @@ export default function MyReservations() {
                   const total = totalOf(r);
                   return (
                     <tr key={r.id} className={canceled ? 'row-canceled' : undefined}>
-                      <td><Link to={`/rooms/${r.roomId}/reservations`}>{roomName(r.roomId)}</Link></td>
+                      <td>
+                        <Link to={`/rooms/${r.roomId}/reservations`}>{roomName(r.roomId)}</Link>
+                        {roomTypeLabel(r.roomId) && <small className="sub-line">{roomTypeLabel(r.roomId)}</small>}
+                      </td>
+                      {admin && <td>{ownerName(r.ownerId)}</td>}
                       <td>
                         {r.guestName}
                         {r.phone && <small className="sub-line">{formatPhone(r.phone)}</small>}

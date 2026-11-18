@@ -4,6 +4,12 @@ import api from './api'
 export const getUsers = () => api.get('/users')
 
 
+export async function listUsers() {
+  const { data } = await api.get('/users/')
+  return data
+}
+
+
 export const getUser = (id) => api.get(`/users/${id}`)
 
 

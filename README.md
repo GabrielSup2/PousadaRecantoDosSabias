@@ -4,6 +4,12 @@ Sistema Web para cadastrar os quartos e controlar as reservas da Pousada Recanto
 
 [![CI](https://github.com/GabrielSup2/PousadaRecantoDosSabias/actions/workflows/main.yml/badge.svg)](https://github.com/GabrielSup2/PousadaRecantoDosSabias/actions)
 
+## Links
+
+- Aplicação publicada: https://pousada-recanto-dos-sabias.vercel.app
+- API: https://pousadarecantodossabias.onrender.com
+- Documentação da API: https://pousadarecantodossabias.onrender.com/docs
+
 ## Visão geral
 
 O sistema centraliza os quartos e as reservas em uma aplicação Web, com validação de datas, capacidade e sobreposição.
@@ -62,10 +68,7 @@ Recanto@2026
 
 ## Deploy
 
-O passo a passo está em [docs/deploy.md](docs/deploy.md).
-
-- API: *(preencher após o deploy no Render)*
-- Aplicação: *(preencher após o deploy na Vercel)*
+O passo a passo está em [docs/deploy.md](docs/deploy.md). Os links da aplicação e da API estão no topo deste README.
 
 ## Persistência
 

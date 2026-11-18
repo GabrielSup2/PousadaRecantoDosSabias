@@ -158,6 +158,16 @@ export default function Reservations() {
 
         {notice && <div className="alert alert-ok" role="status">{notice}</div>}
 
+        {formState && (
+          <ReservationForm
+            room={room}
+            reservation={formState.reservation}
+            reservations={reservations}
+            onSaved={handleSaved}
+            onClose={() => setFormState(null)}
+          />
+        )}
+
         {sorted.length === 0 ? (
           <div className="state">
             <p>Nenhuma reserva para este quarto.</p>
@@ -209,16 +219,6 @@ export default function Reservations() {
           </div>
         )}
       </div>
-
-      {formState && (
-        <ReservationForm
-          room={room}
-          reservation={formState.reservation}
-          reservations={reservations}
-          onSaved={handleSaved}
-          onClose={() => setFormState(null)}
-        />
-      )}
 
       {confirm && (
         <Modal

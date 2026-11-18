@@ -28,6 +28,14 @@ export async function getRoom(id) {
   return fromApi(await request(api.get(`/rooms/${id}`)))
 }
 
+export async function getRoomAvailability(checkIn, checkOut, ignoreReservationId) {
+  const params = { check_in: checkIn, check_out: checkOut }
+  if (ignoreReservationId) params.ignore_reservation_id = ignoreReservationId
+
+  const data = await request(api.get('/rooms/availability', { params }))
+  return data.map((room) => ({ ...fromApi(room), available: room.available }))
+}
+
 export async function createRoom(form) {
   return fromApi(await request(api.post('/rooms', toApi(form))))
 }

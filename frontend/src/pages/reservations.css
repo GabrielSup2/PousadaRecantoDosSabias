@@ -88,3 +88,41 @@
 @media (max-width: 640px) {
   .filters { grid-template-columns: 1fr; }
 }
+
+/* Formulário inline de reserva */
+.res-form-inline {
+  background: #fff;
+  border: 1px solid #e2e0ee;
+  border-radius: 14px;
+  padding: 22px 24px;
+  margin-bottom: 20px;
+}
+
+.res-form-head { margin-bottom: 16px; }
+
+.res-form-head h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.3rem;
+}
+
+.res-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.field-hint {
+  display: block;
+  font-size: 12.5px;
+  color: #625f7a;
+  margin-top: 6px;
+}
+
+.field-hint.ok { color: #0a7a5a; }
+.field-hint.bad { color: #b42318; }
+
+@media (max-width: 640px) {
+  .res-form-inline { padding: 18px 16px; }
+  .res-form-actions .btn { flex: 1; }
+}

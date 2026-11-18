@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Modal from './Modal';
 import {
   createReservation, updateReservation, isCanceled, FORM_FIELD, detailText,
 } from '../services/reservations';
+import { getRoomAvailability } from '../services/rooms';
 import { fieldErrorsFrom422 } from '../utils/formErrors';
 import { brl, digits, formatPhone, formatDate, nightsBetween } from '../utils/format';
 
@@ -32,9 +32,63 @@ export default function ReservationForm({
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [availability, setAvailability] = useState(null); // Map id -> quarto com .available
+  const [checking, setChecking] = useState(false);
+  const [availabilityError, setAvailabilityError] = useState('');
 
   const nights = nightsBetween(form.checkIn, form.checkOut);
   const total = nights > 0 ? nights * (room?.dailyRate ?? 0) : 0;
+
+  useEffect(() => {
+    const datesValid =
+      canPickRoom && form.checkIn && form.checkOut && form.checkOut > form.checkIn;
+    if (!datesValid) {
+      setAvailability(null);
+      setChecking(false);
+      setAvailabilityError('');
+      return undefined;
+    }
+
+    let active = true;
+    setAvailability(null);
+    setChecking(true);
+    setAvailabilityError('');
+
+    getRoomAvailability(form.checkIn, form.checkOut)
+      .then((list) => {
+        if (active) {
+          setAvailability(new Map(list.map((item) => [String(item.id), item])));
+        }
+      })
+      .catch((err) => {
+        if (!active) return;
+        setAvailability(null);
+        if (err.status !== 401) {
+          setAvailabilityError('Não foi possível verificar a disponibilidade agora.');
+        }
+      })
+      .finally(() => {
+        if (active) setChecking(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [canPickRoom, form.checkIn, form.checkOut]);
+
+  const roomAvailability = room ? availability?.get(String(room.id)) : null;
+  const roomAvailable = roomAvailability ? roomAvailability.available : true;
+
+  const localClash = reservations?.find(
+    (r) =>
+      String(r.roomId) === String(room?.id) &&
+      r.id !== reservation?.id &&
+      !isCanceled(r) &&
+      form.checkIn &&
+      form.checkOut &&
+      form.checkIn < r.checkOut &&
+      form.checkOut > r.checkIn
+  );
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -42,7 +96,7 @@ export default function ReservationForm({
     setErrors((er) => ({
       ...er,
       [name]: undefined,
-      ...(name.startsWith('check') ? { checkIn: undefined, checkOut: undefined } : {}),
+      ...(name.startsWith('check') ? { checkIn: undefined, checkOut: undefined, room: undefined } : {}),
     }));
     setFormError('');
   };
@@ -72,15 +126,10 @@ export default function ReservationForm({
     if (!form.checkOut) er.checkOut = 'Informe a data de saída.';
     if (form.checkIn && form.checkOut) {
       if (form.checkOut <= form.checkIn) er.checkOut = 'A saída deve ser depois da entrada.';
-      else if (room) {
-        // Datas ISO comparam bem como texto. A saída de uma reserva pode ser a entrada de outra.
-        const clash = reservations.find(
-          (r) =>
-            String(r.roomId) === String(room.id) && r.id !== reservation?.id && !isCanceled(r) &&
-            form.checkIn < r.checkOut && form.checkOut > r.checkIn
-        );
-        if (clash) er.checkIn = `Já existe reserva de ${formatDate(clash.checkIn)} a ${formatDate(clash.checkOut)} neste quarto.`;
-      }
+      else if (canPickRoom && roomAvailability && !roomAvailability.available)
+        er.room = 'Este quarto está indisponível no período.';
+      else if (localClash)
+        er.checkIn = `Já existe reserva de ${formatDate(localClash.checkIn)} a ${formatDate(localClash.checkOut)} neste quarto.`;
     }
     return er;
   };
@@ -101,7 +150,7 @@ export default function ReservationForm({
       if (err.network) setFormError('Não foi possível conectar ao servidor. Tente de novo.');
       else if (err.status === 401) navigate(`/login?redirect=${pathname}`, { replace: true });
       else if (err.status === 403) setFormError('Você não tem permissão para fazer isso.');
-      else if (err.status === 404) setFormError('Quarto ou reserva não encontrado. Feche e atualize a página.');
+      else if (err.status === 404) setFormError('Quarto ou reserva não encontrado. Atualize a página.');
       else if (err.status === 409) setErrors({ checkIn: 'Este quarto já está reservado em parte desse período.' });
       else if (err.status === 400) setFormError(detailText(err.data) || 'A reserva não atende às regras do sistema.');
       else if (err.status === 422) {
@@ -120,18 +169,42 @@ export default function ReservationForm({
   const aria = (id) => ({ 'aria-invalid': !!errors[id], 'aria-describedby': errors[id] ? `${id}-err` : undefined });
 
   return (
-    <Modal title={editing ? 'Editar reserva' : 'Nova reserva'} onClose={onClose}>
+    <section className="res-form-inline" aria-labelledby="res-form-title">
+      <div className="res-form-head">
+        <h2 id="res-form-title">{editing ? 'Editar reserva' : 'Nova reserva'}</h2>
+      </div>
+
       {formError && <div className="alert alert-error" role="alert">{formError}</div>}
 
       <form onSubmit={handleSubmit} noValidate>
+        <div className="field-row">
+          <div className="field">
+            <label htmlFor="checkIn">Entrada</label>
+            <input id="checkIn" name="checkIn" type="date" value={form.checkIn} onChange={handleChange} {...aria('checkIn')} />
+            {err('checkIn')}
+          </div>
+          <div className="field">
+            <label htmlFor="checkOut">Saída</label>
+            <input id="checkOut" name="checkOut" type="date" min={form.checkIn || undefined} value={form.checkOut} onChange={handleChange} {...aria('checkOut')} />
+            {err('checkOut')}
+          </div>
+        </div>
+
         <div className="field">
           <label htmlFor="room">Quarto</label>
           {canPickRoom ? (
             <select id="room" value={roomId} onChange={handleRoom} {...aria('room')}>
               <option value="">Selecione…</option>
-              {rooms.filter((r) => r.active).map((r) => (
-                <option key={r.id} value={r.id}>{r.name} · até {r.capacity} · {brl.format(r.dailyRate)}</option>
-              ))}
+              {rooms.filter((r) => r.active).map((r) => {
+                const info = availability?.get(String(r.id));
+                const available = info ? info.available : true;
+                const status = checking || !info ? '' : available ? ' · disponível' : ' · indisponível';
+                return (
+                  <option key={r.id} value={r.id} disabled={!available}>
+                    {r.name} · até {r.capacity} · {brl.format(r.dailyRate)}{status}
+                  </option>
+                );
+              })}
             </select>
           ) : (
             <input
@@ -139,6 +212,18 @@ export default function ReservationForm({
               value={room ? `${room.name} · até ${room.capacity} hóspedes · ${brl.format(room.dailyRate)}/diária` : 'Quarto indisponível'}
             />
           )}
+          {checking && <span className="field-hint">Verificando disponibilidade…</span>}
+          {!checking && roomAvailability && (
+            <span className={`field-hint ${roomAvailable ? 'ok' : 'bad'}`}>
+              {roomAvailable
+                ? 'Disponível para o período.'
+                : 'Indisponível: já existe reserva nesse período.'}
+            </span>
+          )}
+          {!checking && !roomAvailability && localClash && (
+            <span className="field-hint bad">Já existe reserva nesse período.</span>
+          )}
+          {availabilityError && <span className="field-hint bad">{availabilityError}</span>}
           {err('room')}
         </div>
 
@@ -161,19 +246,6 @@ export default function ReservationForm({
           </div>
         </div>
 
-        <div className="field-row">
-          <div className="field">
-            <label htmlFor="checkIn">Entrada</label>
-            <input id="checkIn" name="checkIn" type="date" value={form.checkIn} onChange={handleChange} {...aria('checkIn')} />
-            {err('checkIn')}
-          </div>
-          <div className="field">
-            <label htmlFor="checkOut">Saída</label>
-            <input id="checkOut" name="checkOut" type="date" min={form.checkIn || undefined} value={form.checkOut} onChange={handleChange} {...aria('checkOut')} />
-            {err('checkOut')}
-          </div>
-        </div>
-
         <div className="summary" aria-live="polite">
           {nights > 0 && room ? (
             <>
@@ -185,13 +257,13 @@ export default function ReservationForm({
           )}
         </div>
 
-        <div className="modal-actions">
+        <div className="res-form-actions">
           <button type="button" className="btn btn-ghost" onClick={onClose} disabled={saving}>Cancelar</button>
           <button type="submit" className="btn btn-main" disabled={saving}>
             {saving ? 'Salvando…' : editing ? 'Salvar alterações' : 'Criar reserva'}
           </button>
         </div>
       </form>
-    </Modal>
+    </section>
   );
 }

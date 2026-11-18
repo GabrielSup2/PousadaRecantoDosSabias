@@ -170,6 +170,16 @@ export default function MyReservations() {
 
         {notice && <div className="alert alert-ok" role="status">{notice}</div>}
 
+        {formState && (
+          <ReservationForm
+            rooms={rooms}
+            reservation={formState.reservation}
+            reservations={reservations}
+            onSaved={handleSaved}
+            onClose={() => setFormState(null)}
+          />
+        )}
+
         {status === 'ok' && mine.length > 0 && (
           <div className="filters">
             <div className="field">
@@ -266,16 +276,6 @@ export default function MyReservations() {
           </div>
         )}
       </div>
-
-      {formState && (
-        <ReservationForm
-          rooms={rooms}
-          reservation={formState.reservation}
-          reservations={reservations}
-          onSaved={handleSaved}
-          onClose={() => setFormState(null)}
-        />
-      )}
 
       {confirm && (
         <Modal

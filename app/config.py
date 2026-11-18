@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     app_name: str = "pousada-recanto-dos-sabias-api"
     app_host: str = "0.0.0.0"
     app_port: int = 8000
+    cors_origins: str = "*"
 
     jwt_secret: str
     jwt_algorithm: str = "HS256"

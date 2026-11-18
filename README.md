@@ -35,6 +35,38 @@ uvicorn app.main:app --reload
 
 A API fica em `http://localhost:8000`, o health check em `/health` e a documentação em `/docs`.
 
+## Como rodar o frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+O frontend fica em `http://localhost:5173`. Para apontar para outra API, defina `VITE_API_URL`.
+
+## Dados iniciais
+
+```bash
+python scripts/seed.py
+```
+
+O script cria o usuário administrador e os 8 quartos da pousada, sem duplicar o que já existe.
+
+Credenciais de demonstração:
+
+```text
+admin@pousadarecanto.com
+Recanto@2026
+```
+
+## Deploy
+
+O passo a passo está em [docs/deploy.md](docs/deploy.md).
+
+- API: *(preencher após o deploy no Render)*
+- Aplicação: *(preencher após o deploy na Vercel)*
+
 ## Persistência
 
 Os dados são armazenados no Firebase Firestore, nas coleções `rooms`, `reservations` e `users`. A conexão é feita pelo backend com uma conta de serviço; nenhuma credencial é versionada.

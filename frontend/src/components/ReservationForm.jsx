@@ -5,7 +5,7 @@ import {
 } from '../services/reservations';
 import { getRoomAvailability } from '../services/rooms';
 import { fieldErrorsFrom422 } from '../utils/formErrors';
-import { brl, digits, formatPhone, formatDate, nightsBetween } from '../utils/format';
+import { brl, digits, formatPhone, nightsBetween } from '../utils/format';
 
 // Dois usos:
 //  • room = quarto fixo (página do quarto)
@@ -79,6 +79,20 @@ export default function ReservationForm({
   const roomAvailability = room ? availability?.get(String(room.id)) : null;
   const roomAvailable = roomAvailability ? roomAvailability.available : true;
 
+  const datesValid =
+    !!form.checkIn && !!form.checkOut && form.checkOut > form.checkIn;
+  const availableRooms = availability
+    ? rooms.filter((r) => r.active && availability.get(String(r.id))?.available)
+    : rooms.filter((r) => r.active);
+  const unavailableCount =
+    rooms.filter((r) => r.active).length - availableRooms.length;
+
+  useEffect(() => {
+    if (!canPickRoom || !availability || !roomId) return;
+    const info = availability.get(String(roomId));
+    if (!info || !info.available) setRoomId('');
+  }, [availability, canPickRoom, roomId]);
+
   const localClash = reservations?.find(
     (r) =>
       String(r.roomId) === String(room?.id) &&
@@ -109,7 +123,10 @@ export default function ReservationForm({
 
   const validate = () => {
     const er = {};
-    if (!room) er.room = 'Escolha o quarto.';
+    if (!room)
+      er.room = canPickRoom && datesValid
+        ? 'Escolha um quarto disponível.'
+        : 'Escolha o quarto.';
     if (!form.guestName.trim()) er.guestName = 'Informe o nome do hóspede.';
 
     const len = digits(form.phone).length;
@@ -128,8 +145,8 @@ export default function ReservationForm({
       if (form.checkOut <= form.checkIn) er.checkOut = 'A saída deve ser depois da entrada.';
       else if (canPickRoom && roomAvailability && !roomAvailability.available)
         er.room = 'Este quarto está indisponível no período.';
-      else if (localClash)
-        er.checkIn = `Já existe reserva de ${formatDate(localClash.checkIn)} a ${formatDate(localClash.checkOut)} neste quarto.`;
+      else if (!roomAvailability && localClash)
+        er.room = 'Já existe reserva nesse período.';
     }
     return er;
   };
@@ -193,18 +210,27 @@ export default function ReservationForm({
         <div className="field">
           <label htmlFor="room">Quarto</label>
           {canPickRoom ? (
-            <select id="room" value={roomId} onChange={handleRoom} {...aria('room')}>
-              <option value="">Selecione…</option>
-              {rooms.filter((r) => r.active).map((r) => {
-                const info = availability?.get(String(r.id));
-                const available = info ? info.available : true;
-                const status = checking || !info ? '' : available ? ' · disponível' : ' · indisponível';
-                return (
-                  <option key={r.id} value={r.id} disabled={!available}>
-                    {r.name} · até {r.capacity} · {brl.format(r.dailyRate)}{status}
-                  </option>
-                );
-              })}
+            <select
+              id="room"
+              value={roomId}
+              onChange={handleRoom}
+              disabled={!datesValid || checking}
+              {...aria('room')}
+            >
+              <option value="">
+                {!datesValid
+                  ? 'Escolha as datas primeiro'
+                  : checking
+                    ? 'Verificando disponibilidade…'
+                    : availableRooms.length
+                      ? 'Selecione…'
+                      : 'Nenhum quarto disponível'}
+              </option>
+              {!checking && datesValid && availableRooms.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name} · até {r.capacity} · {brl.format(r.dailyRate)}
+                </option>
+              ))}
             </select>
           ) : (
             <input
@@ -222,6 +248,11 @@ export default function ReservationForm({
           )}
           {!checking && !roomAvailability && localClash && (
             <span className="field-hint bad">Já existe reserva nesse período.</span>
+          )}
+          {!checking && datesValid && availability && unavailableCount > 0 && (
+            <span className="field-hint">
+              {unavailableCount} quarto(s) indisponível(is) para o período.
+            </span>
           )}
           {availabilityError && <span className="field-hint bad">{availabilityError}</span>}
           {err('room')}

@@ -6,6 +6,7 @@ import {
 import { getRoomAvailability } from '../services/rooms';
 import { fieldErrorsFrom422 } from '../utils/formErrors';
 import { brl, digits, formatPhone, nightsBetween } from '../utils/format';
+import { ROOM_TYPE_ORDER, ROOM_TYPES, roomTypeKey } from '../utils/roomTypes';
 
 // Dois usos:
 //  • room = quarto fixo (página do quarto)
@@ -20,6 +21,7 @@ export default function ReservationForm({
   const canPickRoom = !fixedRoom && !editing;
 
   const [roomId, setRoomId] = useState(fixedRoom?.id ?? reservation?.roomId ?? '');
+  const [selectedType, setSelectedType] = useState('');
   const room = fixedRoom ?? rooms.find((r) => String(r.id) === String(roomId)) ?? null;
 
   const [form, setForm] = useState({
@@ -87,6 +89,29 @@ export default function ReservationForm({
   const unavailableCount =
     rooms.filter((r) => r.active).length - availableRooms.length;
 
+  const typeGroups = ROOM_TYPE_ORDER.map((key) => {
+    const roomsOfType = availableRooms.filter((r) => roomTypeKey(r) === key);
+    const prices = roomsOfType.map((r) => r.dailyRate);
+    return {
+      key,
+      ...ROOM_TYPES[key],
+      count: roomsOfType.length,
+      price: prices.length ? Math.min(...prices) : null,
+      capacity: roomsOfType.length
+        ? Math.max(...roomsOfType.map((r) => r.capacity))
+        : null,
+    };
+  });
+
+  const selectableRooms = selectedType
+    ? availableRooms.filter((r) => roomTypeKey(r) === selectedType)
+    : availableRooms;
+
+  useEffect(() => {
+    if (!canPickRoom) return;
+    setSelectedType('');
+  }, [canPickRoom, form.checkIn, form.checkOut]);
+
   useEffect(() => {
     if (!canPickRoom || !availability || !roomId) return;
     const info = availability.get(String(roomId));
@@ -117,6 +142,15 @@ export default function ReservationForm({
 
   const handleRoom = (e) => {
     setRoomId(e.target.value);
+    setErrors((er) => ({ ...er, room: undefined, guests: undefined, checkIn: undefined }));
+    setFormError('');
+  };
+
+  const handleType = (key) => {
+    const first = availableRooms.find((r) => roomTypeKey(r) === key);
+    if (!first) return;
+    setSelectedType(key);
+    setRoomId(String(first.id));
     setErrors((er) => ({ ...er, room: undefined, guests: undefined, checkIn: undefined }));
     setFormError('');
   };
@@ -207,6 +241,31 @@ export default function ReservationForm({
           </div>
         </div>
 
+        {datesValid && !checking && availability && (
+          <div className="room-type-grid" aria-label="Tipos de quarto disponíveis">
+            {typeGroups.map((type) => (
+              <button
+                type="button"
+                key={type.key}
+                className={`room-type-card${selectedType === type.key ? ' selected' : ''}`}
+                onClick={() => handleType(type.key)}
+                disabled={type.count === 0}
+              >
+                <span className="room-type-name">{type.label}</span>
+                <span className="room-type-count">
+                  {type.count} {type.count === 1 ? 'disponível' : 'disponíveis'}
+                </span>
+                <span className="room-type-desc">{type.description}</span>
+                <span className="room-type-meta">
+                  {type.capacity ? `Até ${type.capacity} hóspedes · ` : ''}
+                  {type.size}
+                  {type.price != null ? ` · a partir de ${brl.format(type.price)}` : ''}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="field">
           <label htmlFor="room">Quarto</label>
           {canPickRoom ? (
@@ -226,7 +285,7 @@ export default function ReservationForm({
                       ? 'Selecione…'
                       : 'Nenhum quarto disponível'}
               </option>
-              {!checking && datesValid && availableRooms.map((r) => (
+              {!checking && datesValid && selectableRooms.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.name} · até {r.capacity} · {brl.format(r.dailyRate)}
                 </option>

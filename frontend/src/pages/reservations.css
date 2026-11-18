@@ -126,3 +126,65 @@
   .res-form-inline { padding: 18px 16px; }
   .res-form-actions .btn { flex: 1; }
 }
+
+.room-type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+  margin: 16px 0 20px;
+}
+
+.room-type-card {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  text-align: left;
+  background: #f7f6fb;
+  border: 1px solid #e2e0ee;
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.room-type-card:hover:not(:disabled) {
+  border-color: #667eea;
+  background: #fff;
+}
+
+.room-type-card.selected {
+  border-color: #667eea;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
+}
+
+.room-type-card:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.room-type-card:disabled .room-type-count { color: #8c89a3; }
+
+.room-type-name {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.05rem;
+}
+
+.room-type-count {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #0a7a5a;
+}
+
+.room-type-desc {
+  font-size: 12.5px;
+  color: #625f7a;
+  line-height: 1.4;
+}
+
+.room-type-meta {
+  font-size: 12px;
+  color: #4a4763;
+  margin-top: auto;
+}

@@ -9,6 +9,8 @@ import {PasswordInput} from '../components/PasswordInput'
 import {Button} from '../components/Button'
 import {ErrorMessage} from '../components/ErrorMessage'
 import {Link} from '../components/Link'
+import { apiErrorMessage } from '../utils/apiError'
+import { fieldErrorsFrom422 } from '../utils/formErrors'
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -67,7 +69,24 @@ export default function RegisterPage() {
       alert('Conta criada! Faça o login.')
       navigate('/login')
     } catch (err) {
-      setGlobalError(err.message || 'Deu ruim no cadastro')
+      const status = err.response?.status
+      if (status === 400) {
+        setErrors((prev) => ({
+          ...prev,
+          email: apiErrorMessage(err, 'Este e-mail já está cadastrado.'),
+        }))
+      } else if (status === 422) {
+        const raw = fieldErrorsFrom422(err.response?.data)
+        const mapped = {}
+        for (const [key, value] of Object.entries(raw)) {
+          if (key === 'full_name') mapped.nome = value
+          else if (key === 'email' || key === 'password') mapped[key] = value
+        }
+        if (Object.keys(mapped).length) setErrors((prev) => ({ ...prev, ...mapped }))
+        else setGlobalError('Confira os dados informados.')
+      } else {
+        setGlobalError(apiErrorMessage(err, 'Não foi possível criar a conta. Tente novamente.'))
+      }
     } finally {
       setLoading(false)
     }

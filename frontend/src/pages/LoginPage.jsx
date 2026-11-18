@@ -10,6 +10,7 @@ import { Button }             from '../components/Button'
 import { ErrorMessage }       from '../components/ErrorMessage'
 import { Link }               from '../components/Link'
 import { ForgotPasswordModal } from '../components/modal/ForgotPasswordModal'
+import { apiErrorMessage } from '../utils/apiError'
 
 export default function LoginPage() {
   const [email, setEmail]           = useState('')
@@ -41,7 +42,10 @@ export default function LoginPage() {
       await login(email, password)
       navigate('/dashboard')
     } catch (err) {
-      setGlobalError(err.message || 'Email ou senha inválidos')
+      const message = err.response?.status === 401
+        ? 'E-mail ou senha inválidos.'
+        : apiErrorMessage(err, 'Não foi possível entrar. Tente novamente.')
+      setGlobalError(message)
     } finally {
       setLoading(false)
     }

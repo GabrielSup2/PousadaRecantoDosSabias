@@ -110,6 +110,7 @@
 
 /* Modal (dialog nativo) */
 .modal {
+  margin: auto;
   border: 0;
   border-radius: 16px;
   padding: 0;

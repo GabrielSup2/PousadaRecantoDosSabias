@@ -10,7 +10,7 @@ import {
 import ReservationForm from '../components/ReservationForm';
 import Modal from '../components/Modal';
 import { brl, formatDate, formatPhone, nightsBetween } from '../utils/format';
-import { ROOM_TYPES, roomTypeKey } from '../utils/roomTypes';
+import { ROOM_TYPES, ROOM_TYPE_ORDER, roomTypeKey } from '../utils/roomTypes';
 import './rooms.css';
 import './reservations.css';
 
@@ -29,6 +29,7 @@ export default function MyReservations() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [roomFilter, setRoomFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
   const [formState, setFormState] = useState(null); // null | { reservation: null | objeto }
   const [confirm, setConfirm] = useState(null); // null | { type: 'cancel' | 'delete', reservation }
   const [confirmError, setConfirmError] = useState('');
@@ -91,6 +92,13 @@ export default function MyReservations() {
     const room = roomById.get(String(id));
     return room ? ROOM_TYPES[roomTypeKey(room)]?.label ?? '' : '';
   };
+  const typeKeyOf = useCallback(
+    (id) => {
+      const room = roomById.get(String(id));
+      return room ? roomTypeKey(room) : null;
+    },
+    [roomById]
+  );
   const ownerName = (id) => {
     const user = usersById.get(String(id));
     return user?.full_name || user?.email || '—';
@@ -102,6 +110,10 @@ export default function MyReservations() {
     () => [...new Set(mine.map((r) => String(r.roomId)))].map((id) => ({ id, name: roomName(id) })),
     [mine, roomById] // eslint-disable-line react-hooks/exhaustive-deps
   );
+  const typeOptions = useMemo(() => {
+    const present = new Set(mine.map((r) => typeKeyOf(r.roomId)).filter(Boolean));
+    return ROOM_TYPE_ORDER.filter((key) => present.has(key));
+  }, [mine, typeKeyOf]);
 
   const visible = useMemo(() => {
     const q = normalize(search.trim());
@@ -110,10 +122,11 @@ export default function MyReservations() {
         (r) =>
           (statusFilter === 'all' || statusKey(r) === statusFilter) &&
           (roomFilter === 'all' || String(r.roomId) === roomFilter) &&
+          (typeFilter === 'all' || typeKeyOf(r.roomId) === typeFilter) &&
           normalize(r.guestName).includes(q)
       )
       .sort((a, b) => b.checkIn.localeCompare(a.checkIn));
-  }, [mine, search, statusFilter, roomFilter]);
+  }, [mine, search, statusFilter, roomFilter, typeFilter, typeKeyOf]);
 
   const totalOf = (r) => {
     if (r.total != null) return r.total;
@@ -125,6 +138,7 @@ export default function MyReservations() {
     setSearch('');
     setStatusFilter('all');
     setRoomFilter('all');
+    setTypeFilter('all');
   };
 
   const handleSaved = (message) => {
@@ -201,6 +215,13 @@ export default function MyReservations() {
             <div className="field">
               <label htmlFor="search">Buscar hóspede</label>
               <input id="search" type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Nome do hóspede" />
+            </div>
+            <div className="field">
+              <label htmlFor="typeFilter">Tipo de quarto</label>
+              <select id="typeFilter" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
+                <option value="all">Todos</option>
+                {typeOptions.map((key) => <option key={key} value={key}>{ROOM_TYPES[key].label}</option>)}
+              </select>
             </div>
             <div className="field">
               <label htmlFor="roomFilter">Quarto</label>

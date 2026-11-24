@@ -30,6 +30,7 @@ export default function MyReservations() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [roomFilter, setRoomFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('checkIn-desc');
   const [formState, setFormState] = useState(null); // null | { reservation: null | objeto }
   const [confirm, setConfirm] = useState(null); // null | { type: 'cancel' | 'delete', reservation }
   const [confirmError, setConfirmError] = useState('');
@@ -125,8 +126,12 @@ export default function MyReservations() {
           (typeFilter === 'all' || typeKeyOf(r.roomId) === typeFilter) &&
           normalize(r.guestName).includes(q)
       )
-      .sort((a, b) => b.checkIn.localeCompare(a.checkIn));
-  }, [mine, search, statusFilter, roomFilter, typeFilter, typeKeyOf]);
+      .sort((a, b) => {
+        const [field, direction] = sortBy.split('-');
+        const cmp = String(a[field]).localeCompare(String(b[field]));
+        return direction === 'asc' ? cmp : -cmp;
+      });
+  }, [mine, search, statusFilter, roomFilter, typeFilter, typeKeyOf, sortBy]);
 
   const totalOf = (r) => {
     if (r.total != null) return r.total;
@@ -235,6 +240,15 @@ export default function MyReservations() {
               <select id="statusFilter" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
                 <option value="all">Todos</option>
                 {statusOptions.map((s) => <option key={s} value={s}>{STATUS_LABEL[s] || s}</option>)}
+              </select>
+            </div>
+            <div className="field">
+              <label htmlFor="sortBy">Ordenar por</label>
+              <select id="sortBy" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                <option value="checkIn-desc">Entrada (mais recente)</option>
+                <option value="checkIn-asc">Entrada (mais antiga)</option>
+                <option value="checkOut-desc">Saída (mais recente)</option>
+                <option value="checkOut-asc">Saída (mais antiga)</option>
               </select>
             </div>
           </div>

@@ -7,57 +7,62 @@
   --plum: #764ba2;
 
   min-height: 100vh;
+  min-height: 100dvh;
   display: grid;
   place-items: center;
-  padding: 24px;
-  background: linear-gradient(135deg, #f7f6fb, #ece9f8);
+  padding: clamp(24px, 6vw, 72px);
+  background:
+    radial-gradient(circle at 82% 18%, rgba(102, 126, 234, 0.14), transparent 42%),
+    radial-gradient(circle at 12% 84%, rgba(118, 75, 162, 0.12), transparent 42%),
+    linear-gradient(135deg, #f7f6fb, #ece9f8);
   color: var(--ink);
   font-family: 'DM Sans', system-ui, sans-serif;
 }
 
 .not-found-card {
   width: 100%;
-  max-width: 460px;
-  text-align: center;
-  background: #fff;
-  border: 1px solid #e2e0ee;
-  border-radius: 18px;
-  padding: 48px 32px;
-  box-shadow: 0 18px 40px rgba(45, 37, 102, 0.12);
+  max-width: 1040px;
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(24px, 6vw, 72px);
 }
 
 .not-found-code {
-  display: block;
   font-family: 'Fraunces', Georgia, serif;
-  font-size: clamp(4rem, 12vw, 6rem);
-  line-height: 1;
-  color: var(--violet);
+  font-size: clamp(7rem, 17vw, 13rem);
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  background: linear-gradient(135deg, var(--violet), var(--plum));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-.not-found-card h1 {
+.not-found-content h1 {
   font-family: 'Fraunces', Georgia, serif;
-  font-size: 1.7rem;
-  margin-top: 8px;
+  font-size: clamp(1.9rem, 3.2vw, 2.8rem);
+  line-height: 1.15;
 }
 
-.not-found-card p {
+.not-found-content p {
   color: var(--muted);
-  margin-top: 10px;
-  font-size: 15px;
+  margin-top: 14px;
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  max-width: 46ch;
 }
 
 .not-found-actions {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 26px;
+  gap: 14px;
+  margin-top: clamp(24px, 4vw, 36px);
 }
 
 .not-found-page .btn {
   display: inline-block;
   border-radius: 10px;
-  padding: 11px 20px;
+  padding: 13px 24px;
   font-weight: 700;
   text-decoration: none;
 }
@@ -72,8 +77,19 @@
   color: var(--plum);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 720px) {
   .not-found-card {
-    padding: 36px 22px;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .not-found-content p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .not-found-actions {
+    justify-content: center;
   }
 }

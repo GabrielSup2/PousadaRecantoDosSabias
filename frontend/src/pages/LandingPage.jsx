@@ -85,7 +85,7 @@ export default function LandingPage() {
             <span>
               Pousada Recanto
               <br />
-              dos Sábias
+              dos Sabiás
             </span>
           </Link>
 
@@ -102,7 +102,7 @@ export default function LandingPage() {
       <main id="topo">
         <div className="hero">
           <div className="wrap">
-            <h1>Descanse com calma no Recanto dos Sábias</h1>
+            <h1>Descanse com calma no Recanto dos Sabiás</h1>
             <p>Escolha as datas, veja os quartos disponíveis e reserve em poucos minutos.</p>
           </div>
         </div>
@@ -207,7 +207,7 @@ export default function LandingPage() {
 
       <footer>
         <div className="wrap">
-          © {new Date().getFullYear()} Pousada Recanto dos Sábias · Sistema de reservas
+          © {new Date().getFullYear()} Pousada Recanto dos Sabiás · Sistema de reservas
         </div>
       </footer>
     </div>

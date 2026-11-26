@@ -9,7 +9,7 @@ export function AppLogo({ dark = false }) {
           className={`font-bold text-base leading-tight ${dark ? 'text-white' : 'text-slate-800'}`}
           style={{ fontFamily: 'Syne, sans-serif' }}
         >
-          Pousada Recanto<br />dos Sábias
+          Pousada Recanto<br />dos Sabiás
         </span>
         <span className={`block text-xs ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
           sistema de reservas

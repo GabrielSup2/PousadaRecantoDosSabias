@@ -2,7 +2,7 @@
 
 Sistema Web para cadastrar os quartos e controlar as reservas da Pousada Recanto dos Sabiás.
 
-Projeto acadêmico desenvolvido para a disciplina N695 — Desenvolvimento de Plataformas Web, da Universidade de Fortaleza (UNIFOR)
+Projeto Acadêmico desenvolvido para a disciplina N695 — Desenvolvimento de Plataformas Web, da Universidade de Fortaleza (UNIFOR)
 
 [![CI](https://github.com/GabrielSup2/PousadaRecantoDosSabias/actions/workflows/main.yml/badge.svg)](https://github.com/GabrielSup2/PousadaRecantoDosSabias/actions)
 

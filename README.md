@@ -1,6 +1,6 @@
-# Pousada Recanto dos Sábias
+# Pousada Recanto dos Sabiás
 
-Sistema Web para cadastrar os quartos e controlar as reservas da Pousada Recanto dos Sábias.
+Sistema Web para cadastrar os quartos e controlar as reservas da Pousada Recanto dos Sabiás.
 
 [![CI](https://github.com/GabrielSup2/PousadaRecantoDosSabias/actions/workflows/main.yml/badge.svg)](https://github.com/GabrielSup2/PousadaRecantoDosSabias/actions)
 
